@@ -10,7 +10,6 @@ import "./HugoNFTMinter.sol";
 
 /** TODO
 1. discussions
-2. readme
 */
 
 /**
