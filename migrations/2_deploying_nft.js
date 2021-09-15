@@ -2,12 +2,6 @@ const HugoNFT = artifacts.require("HugoNFT");
 
 const TRAIT_NUM = 3;
 const ATTRIBUTE_NAMES = ["head", "glasses", "body", "shirt", "scarf"];
-const rarity = {
-    COMMON: 0,
-    UNCOMMON: 1,
-    RARE: 2,
-    LEGENDARY: 3,
-};
 const exampleCID = "QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR";
 const constructorParams = {
     baseURI: "your base uri",
@@ -20,7 +14,6 @@ const constructorParams = {
             .fill(e)
             .map((e, i) => e+i)
         ),
-    raritiesForEachAttribute: Array(ATTRIBUTE_NAMES.length).fill(Array(TRAIT_NUM).fill(rarity.COMMON)),
     CIDsForEachAttribute: Array(ATTRIBUTE_NAMES.length).fill(exampleCID),
     attributesNames: ATTRIBUTE_NAMES,
 };
@@ -43,7 +36,6 @@ module.exports = function(deployer, network, accounts) {
             constructorParams.generationScript,
             constructorParams.traitAmountForEachAttribute,
             constructorParams.traitNamesForEachAttribute,
-            constructorParams.raritiesForEachAttribute,
             constructorParams.CIDsForEachAttribute,
             constructorParams.attributesNames,
             {from: owner}

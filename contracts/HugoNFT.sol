@@ -30,7 +30,6 @@ contract HugoNFT is HugoNFTMinter {
         // attributes and traits params
         uint256[] memory traitAmountForEachAttribute,
         string[][] memory traitNamesForEachAttribute,
-        Rarity[][] memory raritiesForEachAttribute,
         string[] memory CIDsForEachAttribute,
         string[] memory attributesNames
     )
@@ -42,7 +41,6 @@ contract HugoNFT is HugoNFTMinter {
         require(
             (initialAmountOfAttributes == traitAmountForEachAttribute.length) &&
             (initialAmountOfAttributes == traitNamesForEachAttribute.length) &&
-            (initialAmountOfAttributes == raritiesForEachAttribute.length) &&
             (initialAmountOfAttributes == CIDsForEachAttribute.length) &&
             (initialAmountOfAttributes == attributesNames.length),
             "HugoNFT::disproportion in provided attributes and traits data"
@@ -72,7 +70,6 @@ contract HugoNFT is HugoNFTMinter {
                 i,
                 traitAmountForEachAttribute[i],
                 traitNamesForEachAttribute[i],
-                raritiesForEachAttribute[i],
                 CIDsForEachAttribute[i]
             );
         }
@@ -173,51 +170,6 @@ contract HugoNFT is HugoNFTMinter {
     {
         require(attributeId < currentAttributesAmount, "HugoNFT::invalid attribute id");
         return _traitsOfAttribute[attributeId];
-    }
-
-    /**
-     * @dev Gets traits array for an `attributeId` with requested `rarity`
-     *
-     * We don't know the amount of such traits in advance, so we have to initialize
-     * a max array for such traits. Obviously, it's O(_traitsOfAttribute[attributeId].length).
-     *
-     * After we found all such traits we put them into returning array with a proper length.
-     *
-     * Requirements:
-     * - `attributeId` belongs to interval [0; currentAttributesAmount)
-     *
-     * Returns an array of {HugoNFTType-Trait}s with the requested `rarity`
-     */
-    function getTraitsWithRarityByAttribute(uint256 attributeId, Rarity rarity)
-        external
-        view
-        returns (Trait[] memory)
-    {
-        require(attributeId < currentAttributesAmount, "HugoNFT::invalid attribute id");
-
-        Trait[] storage tOA = _traitsOfAttribute[attributeId];
-
-        uint256 foundTraitsWithRequestedRarity = 0;
-        // Needs to compute position of the needed trait in tmp array,
-        // so the first found trait will be placed at the 0 index, not at the current i.
-        uint256 misses = 0;
-        Trait[] memory tmp = new Trait[](tOA.length);
-        for (uint256 i = 0; i < tOA.length; i++) {
-            if (tOA[i].rarity == rarity) {
-                tmp[i - misses] = tOA[i];
-                foundTraitsWithRequestedRarity += 1;
-            } else {
-                misses += 1;
-            }
-        }
-
-        // Filling all found traits in array with the proper length
-        // The same as getting rif of empty Trait structs on the right
-        Trait[] memory ret = new Trait[](foundTraitsWithRequestedRarity);
-        for (uint256 i = 0; i < foundTraitsWithRequestedRarity; i++) {
-            ret[i] = tmp[i];
-        }
-        return ret;
     }
 
     /**

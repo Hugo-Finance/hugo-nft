@@ -11,7 +11,7 @@ import "./HugoNFTStorage.sol";
  */
 contract HugoNFTMetadataManager is HugoNFTStorage, AccessControl {
     event AddNewAttribute(uint256 indexed newAttributeId, string attributeName, string newScript);
-    event AddNewTrait(uint256 indexed attributeId, uint256 indexed traitId, string name, Rarity rarity);
+    event AddNewTrait(uint256 indexed attributeId, uint256 indexed traitId, string name);
     event UpdateAttributeCID(uint256 indexed attributeId, string ipfsCID);
 
     /**
@@ -36,7 +36,6 @@ contract HugoNFTMetadataManager is HugoNFTStorage, AccessControl {
         string calldata attributeName,
         uint256 amountOfTraits,
         string[] calldata names,
-        Rarity[] calldata rarities,
         string calldata cid,
         string calldata newGenerationScript
     )
@@ -53,7 +52,7 @@ contract HugoNFTMetadataManager is HugoNFTStorage, AccessControl {
         currentAttributesAmount += 1;
 
         _attributes[newAttributeId] = Attribute(newAttributeId, attributeName);
-        addTraits(newAttributeId, amountOfTraits, names, rarities, cid);
+        addTraits(newAttributeId, amountOfTraits, names, cid);
         nftGenerationScripts.push(newGenerationScript);
 
         emit AddNewAttribute(newAttributeId, attributeName, newGenerationScript);
@@ -106,13 +105,12 @@ contract HugoNFTMetadataManager is HugoNFTStorage, AccessControl {
         uint256 attributeId,
         uint256 traitId,
         string calldata name,
-        Rarity rarity,
         string calldata cid
     )
         external
         onlyRole(NFT_ADMIN_ROLE)
     {
-        addTraitWithoutCID(attributeId, traitId, name, rarity);
+        addTraitWithoutCID(attributeId, traitId, name);
         updateAttributeCID(attributeId, cid);
     }
 
@@ -138,7 +136,6 @@ contract HugoNFTMetadataManager is HugoNFTStorage, AccessControl {
         uint256 attributeId,
         uint256 amountOfTraits,
         string[] memory names,
-        Rarity[] memory rarities,
         string memory cid
     )
         public
@@ -149,13 +146,13 @@ contract HugoNFTMetadataManager is HugoNFTStorage, AccessControl {
             "HugoNFT::adding traits number exceeds prohibited amount"
         );
         require(
-            amountOfTraits == names.length && names.length == rarities.length,
-            "HugoNFT::unequal lengths of trait inner data arrays"
+            amountOfTraits == names.length,
+            "HugoNFT::num of traits isn't equal to traits names array length"
         );
 
         uint256 startFromId = _traitsOfAttribute[attributeId].length;
         for (uint256 i = 0; i < amountOfTraits; i++) {
-            addTraitWithoutCID(attributeId, startFromId + i + 1, names[i], rarities[i]);
+            addTraitWithoutCID(attributeId, startFromId + i + 1, names[i]);
         }
         updateAttributeCID(attributeId, cid);
     }
@@ -203,8 +200,7 @@ contract HugoNFTMetadataManager is HugoNFTStorage, AccessControl {
     function addTraitWithoutCID(
         uint256 attributeId,
         uint256 traitId,
-        string memory name,
-        Rarity rarity
+        string memory name
     )
         private
         onlyRole(NFT_ADMIN_ROLE)
@@ -221,9 +217,9 @@ contract HugoNFTMetadataManager is HugoNFTStorage, AccessControl {
         );
         require(bytes(name).length > 0, "HugoNFT::empty trait name");
 
-        Trait memory newTrait = Trait(attributeId, traitId, name, rarity);
+        Trait memory newTrait = Trait(attributeId, traitId, name);
         tA.push(newTrait);
 
-        emit AddNewTrait(attributeId, traitId, name, rarity);
+        emit AddNewTrait(attributeId, traitId, name);
     }
 }
