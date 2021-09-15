@@ -6,10 +6,13 @@ pragma solidity 0.8.7;
  * @dev Types used by HugoNFT project contracts
  */
 contract HugoNFTTypes {
+    enum Rarity{COMMON, UNCOMMON, RARE, LEGENDARY}
+
     struct Trait {
-        uint256 attributeId;
+        uint256 attribute;
         uint256 traitId;
         string name;
+        Rarity rarity;
     }
 
     struct Script {

@@ -51,6 +51,13 @@ contract('HugoNFT', async(accounts) => {
 
     const CORE_ATTRIBUTES = ["head", "glasses", "body", "shirt", "scarf"];
 
+    const rarity = {
+        COMMON: 0,
+        UNCOMMON: 1,
+        RARE: 2,
+        LEGENDARY: 3,
+    }
+
     const tokenURI = "someURI";
     const versionOneAttributesAmount = 5;
     const versionTwoAttributesAmount = 6;
@@ -74,6 +81,7 @@ contract('HugoNFT', async(accounts) => {
                 "some python script",
                 Array(versionOneAttributesAmount).fill(4),
                 Array(versionOneAttributesAmount).fill(Array(4).fill("aaaa")),
+                Array(versionOneAttributesAmount).fill(Array(4).fill(rarity.UNCOMMON)),
                 Array(versionOneAttributesAmount).fill(exampleCID1),
                 CORE_ATTRIBUTES,
                 {from: owner})
@@ -86,6 +94,7 @@ contract('HugoNFT', async(accounts) => {
                 "some python script",
                 Array(versionOneAttributesAmount).fill(4),
                 Array(versionOneAttributesAmount).fill(Array(4).fill("aaaa")),
+                Array(versionOneAttributesAmount).fill(Array(4).fill(rarity.UNCOMMON)),
                 Array(versionOneAttributesAmount).fill(exampleCID1),
                 CORE_ATTRIBUTES,
                 {from: owner})
@@ -98,6 +107,7 @@ contract('HugoNFT', async(accounts) => {
                 "",
                 Array(versionOneAttributesAmount).fill(4),
                 Array(versionOneAttributesAmount).fill(Array(4).fill("aaaa")),
+                Array(versionOneAttributesAmount).fill(Array(4).fill(rarity.UNCOMMON)),
                 Array(versionOneAttributesAmount).fill(exampleCID1),
                 CORE_ATTRIBUTES,
                 {from: owner})
@@ -110,6 +120,7 @@ contract('HugoNFT', async(accounts) => {
                 "some python script",
                 Array(2).fill(4),
                 Array(versionOneAttributesAmount).fill(Array(4).fill("aaaa")),
+                Array(versionOneAttributesAmount).fill(Array(4).fill(rarity.UNCOMMON)),
                 Array(versionOneAttributesAmount).fill(exampleCID1),
                 CORE_ATTRIBUTES,
                 {from: owner})
@@ -121,6 +132,7 @@ contract('HugoNFT', async(accounts) => {
                 "some python script",
                 Array(versionOneAttributesAmount).fill(4),
                 Array(6).fill(Array(4).fill("aaaa")),
+                Array(versionOneAttributesAmount).fill(Array(4).fill(rarity.UNCOMMON)),
                 Array(versionOneAttributesAmount).fill(exampleCID1),
                 CORE_ATTRIBUTES,
                 {from: owner})
@@ -139,6 +151,7 @@ contract('HugoNFT', async(accounts) => {
                     Array(3).fill("Shirt trait"),
                     Array(3).fill("Scarf trait")
                 ],
+                Array(versionOneAttributesAmount).fill(Array(3).fill(rarity.UNCOMMON)),
                 Array(versionOneAttributesAmount).fill(exampleCID1),
                 ["HEAD", "GLASSES", "BODY", "SHIRT", ""],
                 {from: owner})
@@ -156,6 +169,7 @@ contract('HugoNFT', async(accounts) => {
                 Array(3).fill("Shirt trait"),
                 Array(3).fill("Scarf trait")
             ],
+            Array(versionOneAttributesAmount).fill(Array(3).fill(rarity.UNCOMMON)),
             Array(versionOneAttributesAmount).fill(exampleCID1),
             CORE_ATTRIBUTES,
             {from: owner});
@@ -243,6 +257,7 @@ contract('HugoNFT', async(accounts) => {
                     HEAD_ID,
                     10,
                     Array(10).fill("ab"),
+                    Array(10).fill(rarity.COMMON),
                     exampleCID1,
                     {from: account1}
                 )
@@ -253,6 +268,7 @@ contract('HugoNFT', async(accounts) => {
                     HEAD_ID,
                     26,
                     Array(10).fill("ab"),
+                    Array(10).fill(rarity.COMMON),
                     exampleCID1,
                     {from: nft_admin}
                 )
@@ -263,6 +279,17 @@ contract('HugoNFT', async(accounts) => {
                     HEAD_ID,
                     25,
                     Array(10).fill("ab"),
+                    Array(10).fill(rarity.COMMON),
+                    exampleCID1,
+                    {from: nft_admin}
+                )
+            )
+            await expectThrow(
+                nftContract.addTraits(
+                    HEAD_ID,
+                    10,
+                    Array(10).fill("ab"),
+                    Array(5).fill(rarity.COMMON),
                     exampleCID1,
                     {from: nft_admin}
                 )
@@ -275,6 +302,7 @@ contract('HugoNFT', async(accounts) => {
                 HEAD_ID,
                 3,
                 Array(3).fill("Head trait"),
+                Array(3).fill(rarity.COMMON),
                 exampleCID1,
                 {from: nft_admin}
             )
@@ -282,6 +310,7 @@ contract('HugoNFT', async(accounts) => {
                 GLASSES_ID,
                 3,
                 Array(3).fill("Glasses trait"),
+                Array(3).fill(rarity.COMMON),
                 exampleCID1,
                 {from: nft_admin}
             )
@@ -289,6 +318,7 @@ contract('HugoNFT', async(accounts) => {
                 BODY_ID,
                 3,
                 Array(3).fill("Body trait"),
+                Array(3).fill(rarity.COMMON),
                 exampleCID1,
                 {from: nft_admin}
             )
@@ -296,6 +326,7 @@ contract('HugoNFT', async(accounts) => {
                 SHIRT_ID,
                 3,
                 Array(3).fill("Shirt trait"),
+                Array(3).fill(rarity.COMMON),
                 exampleCID1,
                 {from: nft_admin}
             )
@@ -303,6 +334,7 @@ contract('HugoNFT', async(accounts) => {
                 SCARF_ID,
                 3,
                 Array(3).fill("Scarf trait"),
+                Array(3).fill(rarity.COMMON),
                 exampleCID1,
                 {from: nft_admin}
             )
@@ -326,28 +358,28 @@ contract('HugoNFT', async(accounts) => {
         it("should fail adding traits by one", async() => {
             // invalid attribute id
             await expectThrow(
-                nftContract.addTrait(5, 7, "TTT", exampleCID2, {from: nft_admin})
+                nftContract.addTrait(5, 7, "TTT", rarity.LEGENDARY, exampleCID2, {from: nft_admin})
             )
             // trait id spoils sequence (1,2,3,4,5,6,8 )
             await expectThrow(
-                nftContract.addTrait(HEAD_ID, 8, "TTT", exampleCID2, {from: nft_admin})
+                nftContract.addTrait(HEAD_ID, 8, "TTT", rarity.LEGENDARY, exampleCID2, {from: nft_admin})
             )
             // empty name
             await expectThrow(
-                nftContract.addTrait(HEAD_ID, 7, "", exampleCID2, {from: nft_admin})
+                nftContract.addTrait(HEAD_ID, 7, "", rarity.LEGENDARY, exampleCID2, {from: nft_admin})
             )
             // invalid access
             await expectThrow(
-                nftContract.addTrait(HEAD_ID, 7, "Classical Hat", exampleCID2, {from: account1})
+                nftContract.addTrait(HEAD_ID, 7, "Classical Hat", rarity.UNCOMMON, exampleCID2, {from: account1})
             )
         })
 
         it("should add traits by one", async() => {
-            await nftContract.addTrait(HEAD_ID, 7, "Classical Hat", exampleCID2, {from: nft_admin});
-            await nftContract.addTrait(GLASSES_ID, 7,  "RayBan", exampleCID2, {from: nft_admin});
-            await nftContract.addTrait(BODY_ID, 7, "Muscular", exampleCID2, {from: nft_admin});
-            await nftContract.addTrait(SHIRT_ID, 7, "Tuxedo", exampleCID2, {from: nft_admin});
-            await nftContract.addTrait(SCARF_ID, 7, "Gryffindor", exampleCID2, {from: nft_admin});
+            await nftContract.addTrait(HEAD_ID, 7, "Classical Hat", rarity.LEGENDARY, exampleCID2, {from: nft_admin});
+            await nftContract.addTrait(GLASSES_ID, 7,  "RayBan", rarity.LEGENDARY, exampleCID2, {from: nft_admin});
+            await nftContract.addTrait(BODY_ID, 7, "Muscular", rarity.RARE, exampleCID2, {from: nft_admin});
+            await nftContract.addTrait(SHIRT_ID, 7, "Tuxedo", rarity.RARE, exampleCID2, {from: nft_admin});
+            await nftContract.addTrait(SCARF_ID, 7, "Gryffindor", rarity.RARE, exampleCID2, {from: nft_admin});
 
             let traitsOfAttribute0 = await nftContract.getTraitsOfAttribute(HEAD_ID);
             let traitsOfAttribute1 = await nftContract.getTraitsOfAttribute(GLASSES_ID);
@@ -431,6 +463,7 @@ contract('HugoNFT', async(accounts) => {
                     "EYE",
                     3,
                     Array(3).fill("Eyes trait"),
+                    Array(3).fill(rarity.UNCOMMON),
                     exampleCID2,
                     "script2",
                     {from: minter}
@@ -440,6 +473,7 @@ contract('HugoNFT', async(accounts) => {
                 "eye",
                 3,
                 Array(3).fill("Eyes trait"),
+                [rarity.COMMON, rarity.UNCOMMON, rarity.RARE],
                 exampleCID2,
                 "script-attrs-6",
                 {from: nft_admin}
@@ -482,6 +516,7 @@ contract('HugoNFT', async(accounts) => {
                 "background",
                 3,
                 Array(3).fill("Background trait"),
+                [rarity.COMMON, rarity.UNCOMMON, rarity.RARE],
                 exampleCID1,
                 "script-attrs-7",
                 {from: nft_admin}
@@ -781,6 +816,92 @@ contract('HugoNFT', async(accounts) => {
             assert.equal(traitsOfBackGround.length, 3);
         })
 
+        it("should correctly take traits of attribute with exact rarity", async() => {
+            let uncommonHEAD = await nftContract.getTraitsWithRarityByAttribute(HEAD_ID, rarity.UNCOMMON)
+            let lastTrait = uncommonHEAD[uncommonHEAD.length - 1];
+            assert.equal(uncommonHEAD.length, 3);
+            assert.equal(lastTrait.traitId, 3);
+
+            let commonHEAD = await nftContract.getTraitsWithRarityByAttribute(HEAD_ID, rarity.COMMON)
+            lastTrait = commonHEAD[commonHEAD.length - 1];
+            assert.equal(commonHEAD.length, 3);
+            assert.equal(lastTrait.traitId, 6);
+
+            let legendaryGLASSES = await nftContract.getTraitsWithRarityByAttribute(GLASSES_ID, rarity.LEGENDARY)
+            lastTrait = legendaryGLASSES[legendaryGLASSES.length - 1];
+            assert.equal(legendaryGLASSES.length, 1);
+            assert.equal(lastTrait.traitId, 7);
+
+            let rareSHIRT = await nftContract.getTraitsWithRarityByAttribute(SHIRT_ID, rarity.RARE);
+            lastTrait = rareSHIRT[rareSHIRT.length - 1];
+            assert.equal(rareSHIRT.length, 1);
+            assert.equal(lastTrait.traitId, 7);
+
+            let uncommonEYE = await nftContract.getTraitsWithRarityByAttribute(EYE_ID, rarity.UNCOMMON);
+            lastTrait = uncommonEYE[uncommonEYE.length - 1];
+            assert.equal(uncommonEYE.length, 1);
+            assert.equal(lastTrait.traitId, 2);
+
+            let rareBACKGROUND = await nftContract.getTraitsWithRarityByAttribute(BACKGROUND_ID, rarity.RARE);
+            lastTrait = rareBACKGROUND[rareBACKGROUND.length - 1];
+            assert.equal(rareBACKGROUND.length, 1);
+            assert.equal(lastTrait.traitId, 3);
+
+            let commonBACKGROUND = await nftContract.getTraitsWithRarityByAttribute(BACKGROUND_ID, rarity.COMMON);
+            lastTrait = commonBACKGROUND[commonBACKGROUND.length - 1];
+            assert.equal(commonBACKGROUND.length, 1);
+            assert.equal(lastTrait.traitId, 1);
+        })
+
+        it("should correctly take traits of attribute with exact rarity (adding some traits)", async() => {
+            await nftContract.addTraits(
+                HEAD_ID,
+                3,
+                Array(3).fill("head rare traits"),
+                Array(3).fill(rarity.RARE),
+                exampleCID1,
+                {from: nft_admin}
+            )
+
+            let rareHEAD = await nftContract.getTraitsWithRarityByAttribute(HEAD_ID, rarity.RARE)
+            let lastTrait = rareHEAD[rareHEAD.length - 1];
+            assert.equal(rareHEAD.length, 3);
+            assert.equal(lastTrait.traitId, 10);
+
+            await nftContract.addTraits(
+                EYE_ID,
+                2,
+                Array(2).fill("eye common traits"),
+                Array(2).fill(rarity.COMMON),
+                exampleCID2,
+                {from: nft_admin}
+            )
+
+            let commonEYE = await nftContract.getTraitsWithRarityByAttribute(EYE_ID, rarity.COMMON)
+            lastTrait = commonEYE[commonEYE.length - 1];
+            assert.equal(commonEYE.length, 3);
+            assert.equal(lastTrait.traitId, 5);
+
+            await nftContract.addTrait(EYE_ID, 6, "eye uncommon traits", rarity.UNCOMMON, exampleCID2, {from: nft_admin});
+            await nftContract.addTrait(EYE_ID, 7, "eye rare traits", rarity.RARE, exampleCID2, {from: nft_admin});
+            await nftContract.addTrait(EYE_ID, 8, "eye uncommon traits", rarity.UNCOMMON, exampleCID2, {from: nft_admin});
+            await nftContract.addTrait(EYE_ID, 9, "eye rare traits", rarity.RARE, exampleCID2, {from: nft_admin});
+
+            let uncommonEYE = await nftContract.getTraitsWithRarityByAttribute(EYE_ID, rarity.UNCOMMON)
+            lastTrait = uncommonEYE[uncommonEYE.length - 1];
+            let firstTrait = uncommonEYE[0];
+            assert.equal(uncommonEYE.length, 3);
+            assert.equal(firstTrait.traitId, 2);
+            assert.equal(lastTrait.traitId, 8);
+
+            let rareEYE = await nftContract.getTraitsWithRarityByAttribute(EYE_ID, rarity.RARE)
+            lastTrait = rareEYE[rareEYE.length - 1];
+            firstTrait = rareEYE[0];
+            assert.equal(rareEYE.length, 3);
+            assert.equal(firstTrait.traitId, 3);
+            assert.equal(lastTrait.traitId, 9);
+        })
+
         it("should properly check whether seed was used", async() => {
             // invalid seed length: too short
             await expectThrow(
@@ -805,7 +926,7 @@ contract('HugoNFT', async(accounts) => {
 
             let isUsed1 = await nftContract.isUsedSeed([1, 1, 1, 1, 1, 0])
             let isUsed2 = await nftContract.isUsedSeed([1, 1, 1, 1, 1, 0, 0])
-            let isUsed3 = await nftContract.isUsedSeed([3, 1, 2, 1, 1, 3])
+            let isUsed3 = await nftContract.isUsedSeed([3, 1, 2, 1, 1, 4])
             let isUsed4 = await nftContract.isUsedSeed([1, 2, 3, 4, 5, 3])
             let isUsed5 = await nftContract.isUsedSeed([1, 2, 3, 4, 5, 3, 0])
             let isUsed6 = await nftContract.isUsedSeed([1, 2, 3, 4, 5, 0, 3])
@@ -871,7 +992,7 @@ contract('HugoNFT', async(accounts) => {
                 nftContract.traitIpfsPath(BACKGROUND_ID, 4)
             )
             let trait1Address = await nftContract.traitIpfsPath(HEAD_ID, 3);
-            assert.equal("ipfs://".concat(exampleCID2, "/", "3"), trait1Address);
+            assert.equal("ipfs://".concat(exampleCID1, "/", "3"), trait1Address);
             let trait2Address = await nftContract.traitIpfsPath(EYE_ID, 1);
             assert.equal("ipfs://".concat(exampleCID2, "/", "1"), trait2Address);
         })
