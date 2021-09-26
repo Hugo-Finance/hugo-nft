@@ -871,9 +871,9 @@ contract('HugoNFT', async(accounts) => {
                 nftContract.traitIpfsPath(BACKGROUND_ID, 4)
             )
             let trait1Address = await nftContract.traitIpfsPath(HEAD_ID, 3);
-            assert.equal("ipfs://".concat(exampleCID2, "/", "3"), trait1Address);
+            assert.equal("ipfs://".concat(exampleCID2, "/3.png"), trait1Address);
             let trait2Address = await nftContract.traitIpfsPath(EYE_ID, 1);
-            assert.equal("ipfs://".concat(exampleCID2, "/", "1"), trait2Address);
+            assert.equal("ipfs://".concat(exampleCID2, "/1.png"), trait2Address);
         })
 
         it("should properly show script", async() => {

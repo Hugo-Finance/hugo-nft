@@ -5,8 +5,8 @@ import "./HugoNFTTypes.sol";
 
 /**
  * @author SabaunT https://github.com/SabaunT.
- * @notice There is a defined in order of values of seed, CIDs, and such arrays,
- * which is defined in constructor. See: todo link.
+ * @notice There is a defined order of values of seed, CIDs, and such arrays,
+ * which is defined in constructor. See: https://github.com/SabaunT/hugo-nft/blob/master/contracts/HugoNFT.sol#L57-L75.
  * It means, that if attribute names were defined in constructor in the next order
  * ["head", "glasses", "body", "shirt", "scarf"], then the first number in seed array
  * is a trait id of the head attribute. The second number in the CIDs array is a CID

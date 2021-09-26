@@ -3,9 +3,9 @@ pragma solidity 0.8.7;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-import "./HugoNFTMetadataManager.sol";
+import "./HugoNFTAbstractImpl.sol";
 
-abstract contract HugoNFTMinter is HugoNFTMetadataManager, ERC721 {
+abstract contract HugoNFTMinter is ERC721, HugoNFTAbstractImpl {
     event Mint(address indexed to, uint256 indexed tokenId, string name, string description);
     event ChangeName(uint256 indexed tokenId, string name);
     event ChangeDescription(uint256 indexed tokenId, string description);
@@ -17,7 +17,7 @@ abstract contract HugoNFTMinter is HugoNFTMetadataManager, ERC721 {
      * of the NFT. The function is intended to be called by an NFT shop or owner
      * for a give away program.
      *
-     * Concerning seed validation and requirements for it inner structure, see todo link to nft storage notice comment
+     * Concerning seed validation and requirements for it inner structure, see https://github.com/SabaunT/hugo-nft/blob/master/contracts/HugoNFTStorage.sol#L8-L13
      * and {HugoNFTMinter-_isValidSeed} with {HugoNFTMinter-_isNewSeed}.
      *
      * Requirements:
@@ -32,6 +32,7 @@ abstract contract HugoNFTMinter is HugoNFTMetadataManager, ERC721 {
         string calldata description
     )
         external
+        override(AbstractHugoNFT)
         onlyRole(MINTER_ROLE)
     {
         require(
@@ -84,6 +85,7 @@ abstract contract HugoNFTMinter is HugoNFTMetadataManager, ERC721 {
         string calldata cid
     )
         external
+        override(AbstractHugoNFT)
         onlyRole(MINTER_ROLE)
     {
         require(
@@ -124,6 +126,7 @@ abstract contract HugoNFTMinter is HugoNFTMetadataManager, ERC721 {
      */
     function changeNFTName(uint256 tokenId, string calldata name)
         external
+        override(AbstractHugoNFT)
         onlyRole(NFT_ADMIN_ROLE)
     {
         require(_tokenExists(tokenId), "HugoNFT::nft with such id doesn't exist");
@@ -147,6 +150,7 @@ abstract contract HugoNFTMinter is HugoNFTMetadataManager, ERC721 {
      */
     function changeNFTDescription(uint256 tokenId, string calldata description)
         external
+        override(AbstractHugoNFT)
         onlyRole(NFT_ADMIN_ROLE)
     {
         require(_tokenExists(tokenId), "HugoNFT::nft with such id doesn't exist");
@@ -166,7 +170,8 @@ abstract contract HugoNFTMinter is HugoNFTMetadataManager, ERC721 {
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721, AccessControl)
+        virtual
+        override(HugoNFTAbstractImpl, ERC721)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);

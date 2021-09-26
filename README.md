@@ -2,6 +2,8 @@
 The contract defines core minting logic and NFTs metadata management. By metadata the following things are meant:
 attributes, their traits and IPFS CIDs for them.
 
+See this [contract](./contracts/AbstractHugoNFT.sol), to understand NFT interface.
+
 ## Testing
 ### Primarly
 1. *development* network is for running unit-tests defined in `tests` folder. Its id is 5777.

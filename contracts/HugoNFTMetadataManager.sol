@@ -1,15 +1,14 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.7;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
 
-import "./HugoNFTStorage.sol";
+import "./HugoNFTAbstractImpl.sol";
 
 /**
  * @author SabaunT https://github.com/SabaunT.
  * @dev Management for attributes, traits and CIDs - all are named as meta-data.
  */
-contract HugoNFTMetadataManager is HugoNFTStorage, AccessControl {
+abstract contract HugoNFTMetadataManager is HugoNFTAbstractImpl {
     event AddNewAttribute(uint256 indexed newAttributeId, string attributeName, string newScript);
     event AddNewTrait(uint256 indexed attributeId, uint256 indexed traitId, string name);
     event UpdateAttributeCID(uint256 indexed attributeId, string ipfsCID);
@@ -40,6 +39,7 @@ contract HugoNFTMetadataManager is HugoNFTStorage, AccessControl {
         string calldata newGenerationScript
     )
         external
+        override(AbstractHugoNFT)
         onlyRole(NFT_ADMIN_ROLE)
     {
         require(bytes(attributeName).length > 0, "HugoNFT::attribute name is empty");
@@ -74,6 +74,7 @@ contract HugoNFTMetadataManager is HugoNFTStorage, AccessControl {
      */
     function updateMultipleAttributesCIDs(string[] calldata CIDs)
         external
+        override(AbstractHugoNFT)
         onlyRole(NFT_ADMIN_ROLE)
     {
         require(
@@ -108,6 +109,7 @@ contract HugoNFTMetadataManager is HugoNFTStorage, AccessControl {
         string calldata cid
     )
         external
+        override(AbstractHugoNFT)
         onlyRole(NFT_ADMIN_ROLE)
     {
         addTraitWithoutCID(attributeId, traitId, name);
@@ -139,6 +141,7 @@ contract HugoNFTMetadataManager is HugoNFTStorage, AccessControl {
         string memory cid
     )
         public
+        override(AbstractHugoNFT)
         onlyRole(NFT_ADMIN_ROLE)
     {
         require(
@@ -170,6 +173,7 @@ contract HugoNFTMetadataManager is HugoNFTStorage, AccessControl {
      */
     function updateAttributeCID(uint256 attributeId, string memory ipfsCID)
         public
+        override(AbstractHugoNFT)
         onlyRole(NFT_ADMIN_ROLE)
     {
         require(attributeId < currentAttributesAmount, "HugoNFT::invalid attribute id");

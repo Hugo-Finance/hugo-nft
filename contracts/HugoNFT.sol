@@ -2,15 +2,11 @@
 pragma solidity 0.8.7;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "./HugoNFTMinter.sol";
-
-/** TODO
-1. discussions
-*/
+import "./HugoNFTMetadataManager.sol";
 
 /**
  * @author SabaunT https://github.com/SabaunT.
@@ -18,7 +14,7 @@ import "./HugoNFTMinter.sol";
  *
  * This contract is mainly "focused" on view functions.
  */
-contract HugoNFT is HugoNFTMinter {
+contract HugoNFT is HugoNFTMinter, HugoNFTMetadataManager {
     using Strings for uint256;
 
     // todo discuss Deploying with 25 traits and 5 attributes requires gas usage of ~20000000
@@ -97,6 +93,7 @@ contract HugoNFT is HugoNFTMinter {
     function getAttributeData(uint256 attributeId)
         external
         view
+        override(AbstractHugoNFT)
         returns (Attribute memory)
     {
         require(attributeId < currentAttributesAmount, "HugoNFT::invalid attribute id");
@@ -121,6 +118,7 @@ contract HugoNFT is HugoNFTMinter {
     function getGenerationScriptForAttributesNum(uint256 attributesNum)
         external
         view
+        override(AbstractHugoNFT)
         returns (string memory)
     {
         require(
@@ -134,7 +132,12 @@ contract HugoNFT is HugoNFTMinter {
     /**
      * @dev Returns an amount of auto-generated NFTs already minted.
      */
-    function generatedNFTsAmount() external view returns (uint256) {
+    function generatedNFTsAmount()
+        external
+        view
+        override(AbstractHugoNFT)
+        returns (uint256)
+    {
         return _getGeneratedHugoAmount();
     }
 
@@ -149,6 +152,7 @@ contract HugoNFT is HugoNFTMinter {
     function getCIDsOfAttribute(uint256 attributeId)
         external
         view
+        override(AbstractHugoNFT)
         returns (string[] memory)
     {
         require(attributeId < currentAttributesAmount, "HugoNFT::invalid attribute id");
@@ -166,6 +170,7 @@ contract HugoNFT is HugoNFTMinter {
     function getTraitsOfAttribute(uint256 attributeId)
         external
         view
+        override(AbstractHugoNFT)
         returns (Trait[] memory)
     {
         require(attributeId < currentAttributesAmount, "HugoNFT::invalid attribute id");
@@ -178,6 +183,7 @@ contract HugoNFT is HugoNFTMinter {
     function tokenIdsOfOwner(address account)
         external
         view
+        override(AbstractHugoNFT)
         returns (uint256[] memory)
     {
         return _tokenIdsOfAccount[account];
@@ -190,13 +196,23 @@ contract HugoNFT is HugoNFTMinter {
      *
      * Returns true if `seed` is used, otherwise - false.
      */
-    function isUsedSeed(uint256[] calldata seed) external view returns (bool) {
+    function isUsedSeed(uint256[] calldata seed)
+        external
+        view
+        override(AbstractHugoNFT)
+        returns (bool)
+    {
         require(_isValidSeed(seed), "HugoNFT::an invalid seed was provided");
         return _isUsedSeed[_getSeedHash(seed)];
     }
 
     // Returns array of {HugoNFTType-NFT} structs, which have requested token ids.
-    function getNFTs(uint256[] calldata tokenIds) external view returns (NFT[] memory) {
+    function getNFTs(uint256[] calldata tokenIds)
+        external
+        view
+        override(AbstractHugoNFT)
+        returns (NFT[] memory)
+    {
         NFT[] memory ret = new NFT[](tokenIds.length);
         for (uint256 i = 0; i < tokenIds.length; i++) {
             uint256 tokenId = tokenIds[i];
@@ -218,17 +234,14 @@ contract HugoNFT is HugoNFTMinter {
     function getNFT(uint256 tokenId)
         public
         view
+        override(AbstractHugoNFT)
         returns (NFT memory)
     {
-        NFT memory retNFT;
-        if (_tokenExists(tokenId)) {
-            retNFT = _NFTs[tokenId];
-            if (_isIdOfGeneratedNFT(tokenId)) {
-                retNFT.seed = _standardizeSeed(retNFT.seed);
-            }
-        } else {
-            // default NFT
-            retNFT = NFT(0, "", "", new uint256[](0), "", 0);
+        NFT memory retNFT = _NFTs[tokenId];
+        // Check for existence is introduced. because we should not standardize seed
+        // for non-existing NFT. Also, non-existing NFT passes the `_isIdOfGeneratedNFT` check.
+        if (_tokenExists(tokenId) && _isIdOfGeneratedNFT(tokenId)) {
+            retNFT.seed = _standardizeSeed(retNFT.seed);
         }
         return retNFT;
     }
@@ -247,6 +260,7 @@ contract HugoNFT is HugoNFTMinter {
     function traitIpfsPath(uint256 attributeId, uint256 traitId)
         external
         view
+        override(AbstractHugoNFT)
         returns (string memory)
     {
         require(attributeId < currentAttributesAmount, "HugoNFT::invalid attribute id");
@@ -261,7 +275,20 @@ contract HugoNFT is HugoNFTMinter {
 
         string[] memory lastCIDs = validCIDs();
         string memory attributeCID = lastCIDs[attributeId];
-        return string(abi.encodePacked("ipfs://", attributeCID, "/", traitId.toString()));
+        return string(abi.encodePacked("ipfs://", attributeCID, "/", traitId.toString(), ".png"));
+    }
+
+    /**
+     * @dev See {IERC165-supportsInterface}.
+     */
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(HugoNFTAbstractImpl, HugoNFTMinter)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 
     /**
