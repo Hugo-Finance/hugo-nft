@@ -24,7 +24,7 @@ contract HugoNFTStorage is HugoNFTTypes {
     // Length of the CID in base58 representation
     uint256 internal constant IPFS_CID_BYTES_LENGTH = 46;
     // Maximum adding at once
-    uint256 internal constant MAX_ADDING_TRAITS = 25;
+    uint256 internal constant MAX_ADDING_TRAITS = 30;
 
     // Total NFTs minted
     uint256 public totalSupply;
