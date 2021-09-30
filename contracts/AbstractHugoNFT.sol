@@ -17,7 +17,8 @@ abstract contract AbstractHugoNFT is HugoNFTTypes {
         string calldata description
     )
         external
-        virtual;
+        virtual
+        returns (uint256 newTokenId);
 
     // @dev Mints a new exclusive NFT for a `to` address.
     function mintExclusive(
@@ -27,7 +28,8 @@ abstract contract AbstractHugoNFT is HugoNFTTypes {
         string calldata cid
     )
         external
-        virtual;
+        virtual
+        returns (uint256 newTokenId);
 
     // @dev Changes name of the NFT with provided tokenId.
     function changeNFTName(uint256 tokenId, string calldata name)

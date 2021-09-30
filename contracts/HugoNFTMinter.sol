@@ -20,6 +20,8 @@ abstract contract HugoNFTMinter is ERC721, HugoNFTAbstractImpl {
      * Concerning seed validation and requirements for it inner structure, see https://github.com/SabaunT/hugo-nft/blob/master/contracts/HugoNFTStorage.sol#L8-L13
      * and {HugoNFTMinter-_isValidSeed} with {HugoNFTMinter-_isNewSeed}.
      *
+     * Returns id of the newly generated NFT.
+     *
      * Requirements:
      * - `msg.sender` should have {HugoNFTStorage-MINTER_ROLE}
      * - `seed` should be valid
@@ -34,6 +36,7 @@ abstract contract HugoNFTMinter is ERC721, HugoNFTAbstractImpl {
         external
         override(AbstractHugoNFT)
         onlyRole(MINTER_ROLE)
+        returns (uint256 newTokenId)
     {
         require(
             _getGeneratedHugoAmount() < generatedHugoCap,
@@ -52,7 +55,7 @@ abstract contract HugoNFTMinter is ERC721, HugoNFTAbstractImpl {
             "HugoNFT::invalid NFT description length"
         );
 
-        uint256 newTokenId = _getNewIdForGeneratedHugo();
+        newTokenId = _getNewIdForGeneratedHugo();
         super._safeMint(to, newTokenId);
 
         totalSupply += 1;
@@ -65,6 +68,8 @@ abstract contract HugoNFTMinter is ERC721, HugoNFTAbstractImpl {
         _isUsedSeed[seedHash] = true;
 
         emit Mint(to, newTokenId, name, description);
+
+        return newTokenId;
     }
 
     /**
@@ -72,6 +77,8 @@ abstract contract HugoNFTMinter is ERC721, HugoNFTAbstractImpl {
      *
      * Mints an exclusive NFT, whose IPFS CID is defined under `cid` string.
      * Doesn't require any seeds.
+     *
+     * Returns id of the newly generated NFT.
      *
      * Requirements:
      * - `msg.sender` should have {HugoNFTStorage-MINTER_ROLE}
@@ -87,6 +94,7 @@ abstract contract HugoNFTMinter is ERC721, HugoNFTAbstractImpl {
         external
         override(AbstractHugoNFT)
         onlyRole(MINTER_ROLE)
+        returns (uint256 newTokenId)
     {
         require(
             bytes(name).length > 0 && bytes(name).length <= 75,
@@ -101,7 +109,7 @@ abstract contract HugoNFTMinter is ERC721, HugoNFTAbstractImpl {
             "HugoNFT::invalid ipfs CID length"
         );
 
-        uint256 newTokenId = _getNewIdForExclusiveHugo();
+        newTokenId = _getNewIdForExclusiveHugo();
         super._safeMint(to, newTokenId);
 
         totalSupply += 1;
@@ -114,6 +122,8 @@ abstract contract HugoNFTMinter is ERC721, HugoNFTAbstractImpl {
         _NFTs[newTokenId] = NFT(newTokenId, name, description, new uint256[](0), cid, idInArrayOfIds);
 
         emit Mint(to, newTokenId, name, description);
+
+        return newTokenId;
     }
 
     /**
@@ -276,11 +286,23 @@ abstract contract HugoNFTMinter is ERC721, HugoNFTAbstractImpl {
         return tokenId < generatedHugoCap;
     }
 
-    // If token doesn't exist, then it's id will have a default value, i.e. 0.
-    // Also its name will be an empty string.
+    /**
+     * @dev Checks whether token exists
+     *
+     * If token doesn't exist it will have zero length seed and zero length CID.
+     * Otherwise token will have either seed length being not equal to 0,
+     * or CID length being equal to {HugoNFTStorage-IPFS_CID_BYTES_LENGTH}.
+     *
+     * We could define such check for seed: `nft.seed.length >= minAttributesAmount`, but
+     * if constructor changes, then we can have a risk of this check becoming invalid. For example,
+     * if we get rid of setting value to {HugoNFTStorage-minAttributesAmount} in constructor during,
+     * say, refactoring, this check will be invalid.
+     *
+     * Return true if token with `tokenId` exists, otherwise returns false.
+     */
     function _tokenExists(uint256 tokenId) internal view returns (bool) {
         NFT storage nft = _NFTs[tokenId];
-        return nft.tokenId == tokenId && bytes(nft.name).length > 0;
+        return nft.seed.length != 0 || bytes(nft.cid).length == IPFS_CID_BYTES_LENGTH;
     }
 
     function _getGeneratedHugoAmount() internal view returns (uint256) {
