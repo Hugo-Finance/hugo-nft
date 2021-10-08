@@ -166,6 +166,44 @@ contract('HugoNFT', async(accounts) => {
     })
 
     describe("Managing attributes, traits and attributes CIDs", async() => {
+        it("should fail changing trait name", async() => {
+            // invalid acccess
+            await expectThrow(
+                nftContract.changeTraitName(2, 1, "some name", {from: account1})
+            )
+            // invalid attributes amount
+            await expectThrow(
+                nftContract.changeTraitName(5, 1, "some name", {from: nft_admin})
+            )
+            // invalid trait id
+            await expectThrow(
+                nftContract.changeTraitName(4, 0, "some name", {from: nft_admin})
+            )
+            // empty trait name
+            await expectThrow(
+                nftContract.changeTraitName(4, 1, "", {from: nft_admin})
+            )
+            // trait doesn't exist
+            await expectThrow(
+                nftContract.changeTraitName(4, 10, "some name", {from: nft_admin})
+            )
+        })
+
+        it("should change trait name", async() => {
+            let changingAttributeId = 0;
+            let changingTraitId = 1;
+            await nftContract.changeTraitName(changingAttributeId, changingTraitId, "First ever head trait", {from: nft_admin});
+
+            let traits = await nftContract.getTraitsOfAttribute(changingAttributeId);
+            let changedTrait = traits[changingTraitId - 1];
+
+            assert.equal(changingTraitId, changedTrait.traitId)
+            assert.equal("First ever head trait", changedTrait.name)
+
+            // change back
+            await nftContract.changeTraitName(changingAttributeId, changingTraitId, "Head trait", {from: nft_admin});
+        })
+
         it("should fail updating multiple attributes CIDs ", async() => {
             let emptyCIDsData = Array(versionOneAttributesAmount).fill("");
             let invalidCIDLenData = Array(versionOneAttributesAmount).fill("12");

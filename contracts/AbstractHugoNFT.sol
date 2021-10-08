@@ -86,6 +86,11 @@ abstract contract AbstractHugoNFT is HugoNFTTypes {
         external
         virtual;
 
+    // @dev Changes name of the trait in the particular attribute
+    function changeTraitName(uint256 attributeId, uint256 traitId, string calldata newName)
+        external
+        virtual;
+
     //// ----------------------------------------------- \\\\
     //// ---------------- View functions --------------- \\\\
     //// ----------------------------------------------- \\\\
